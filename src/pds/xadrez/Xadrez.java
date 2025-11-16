@@ -7,6 +7,7 @@ import javax.swing.*;
 
 import pds.peca.Peca;
 import pds.peca.Tabuleiro;
+import pds.xadrez.Torre;
 
 public class Xadrez extends JFrame implements ActionListener {
 
@@ -67,11 +68,14 @@ public class Xadrez extends JFrame implements ActionListener {
 			oTabuleiro.colocarPeca(new Point(i + 1, 7), new Peao(Peca.PRETAS, peaoPreto));
 		}
 
-		// TODO criação e colocação das restantes peças brancas
+		//Torres brancas
+		oTabuleiro.colocarPeca(new Point(1, 1), new Torre(Peca.BRANCAS, torreBranca));
+		oTabuleiro.colocarPeca(new Point(8, 1), new Torre(Peca.BRANCAS, torreBranca));
+		
+		//Torres pretas
+		oTabuleiro.colocarPeca(new Point(1, 8), new Torre(Peca.PRETAS, torrePreta));
+		oTabuleiro.colocarPeca(new Point(8, 8), new Torre(Peca.PRETAS, torrePreta));
 
-		// TODO criação e colocação das restantes peças pretas
-
-		// TODO começam as brancas
 
 		selecionada = null;
 	}
