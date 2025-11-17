@@ -8,6 +8,7 @@ import javax.swing.*;
 import pds.peca.Peca;
 import pds.peca.Tabuleiro;
 import pds.xadrez.Torre;
+import pds.xadrez.Bispo;
 
 public class Xadrez extends JFrame implements ActionListener {
 
@@ -76,6 +77,21 @@ public class Xadrez extends JFrame implements ActionListener {
 		oTabuleiro.colocarPeca(new Point(1, 8), new Torre(Peca.PRETAS, torrePreta));
 		oTabuleiro.colocarPeca(new Point(8, 8), new Torre(Peca.PRETAS, torrePreta));
 
+		// Bispos brancos
+		oTabuleiro.colocarPeca(new Point(3,1), new Bispo(Peca.BRANCAS, bispoBranco));
+		oTabuleiro.colocarPeca(new Point(6, 1), new Bispo(Peca.BRANCAS, bispoBranco));
+
+		// Bispos pretos
+		oTabuleiro.colocarPeca(new Point(3,8), new Bispo(Peca.PRETAS, bispoPreto));
+		oTabuleiro.colocarPeca(new Point(6, 8), new Bispo(Peca.PRETAS, bispoPreto));
+
+		// Cavalos brancos
+		oTabuleiro.colocarPeca(new Point(2,1), new Cavalo(Peca.BRANCAS, cavaloBranco));
+		oTabuleiro.colocarPeca(new Point(7,1), new Cavalo(Peca.BRANCAS, cavaloBranco));
+
+		// Cavalos pretos
+		oTabuleiro.colocarPeca(new Point(2,8), new Cavalo(Peca.PRETAS, cavaloPreto));
+		oTabuleiro.colocarPeca(new Point(7,8), new Cavalo(Peca.PRETAS, cavaloPreto));
 
 		selecionada = null;
 	}
