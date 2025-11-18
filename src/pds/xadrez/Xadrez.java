@@ -93,7 +93,17 @@ public class Xadrez extends JFrame implements ActionListener {
 		oTabuleiro.colocarPeca(new Point(2,8), new Cavalo(Peca.PRETAS, cavaloPreto));
 		oTabuleiro.colocarPeca(new Point(7,8), new Cavalo(Peca.PRETAS, cavaloPreto));
 
+		// Rainha branca
+		oTabuleiro.colocarPeca(new Point(4, 1), new Rainha(Peca.BRANCAS, rainhaBranca));
+		// Rei branco
+		oTabuleiro.colocarPeca(new Point(5, 1), new Rei(Peca.BRANCAS, reiBranco));
+		// Rainha preta
+		oTabuleiro.colocarPeca(new Point(4, 8), new Rainha(Peca.PRETAS, rainhaPreta));
+		// Rei preto
+		oTabuleiro.colocarPeca(new Point(5, 8), new Rei(Peca.PRETAS, reiPreto));
+
 		selecionada = null;
+		turno = Peca.BRANCAS;
 	}
 
 	/**
@@ -144,7 +154,18 @@ public class Xadrez extends JFrame implements ActionListener {
 	private void pegarPeca(MouseEvent e) {
 		Point ecran = e.getPoint();
 
-		// TODO ver qual a peça a selecionar e se pode ser selecionada
+		Point posicao = oTabuleiro.getCasa(ecran);
+
+		Peca peca = oTabuleiro.getPeca(posicao);
+
+		if (peca != null && peca.getCor() == turno) {
+			selecionada = peca;
+			origem = posicao;
+			repaint();
+		}
+
+
+		
 	}
 
 	/**
@@ -173,8 +194,20 @@ public class Xadrez extends JFrame implements ActionListener {
 		if (selecionada == null)
 			return;
 
-		// TODO fazer a jogada, se esta for possível e mudar o turno
-		// TODO não esquecer de promover a peça
+		if (selecionada.podeMover(destino)){
+			oTabuleiro.moverPeca(origem, destino);
+
+			if(selecionada instanceof Peao){
+				if((selecionada.getCor() == Peca.BRANCAS && destino.y == 8) || 
+				(selecionada.getCor() == Peca.PRETAS && destino.y == 1)) {
+					Peca nova = promover(selecionada.getCor());
+					oTabuleiro.colocarPeca(destino, nova);
+					
+				
+				}
+			}
+			turno = (turno == Peca.BRANCAS) ? Peca.PRETAS : Peca.BRANCAS;
+		}
 
 		// a jogada foi feita, desselecionar a peça e redesenhar o jogo
 		selecionada = null;
