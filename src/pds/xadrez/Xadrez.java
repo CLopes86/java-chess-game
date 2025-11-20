@@ -121,10 +121,13 @@ public class Xadrez extends JFrame implements ActionListener {
 
 		if (selecionada != null) {
 			if (destino != null) {
-				// TODO ver se a jogada é válida para decidir a cor do rectângulo
+				 // decidir a cor do rectângulo baseado na validade da jogada
+				 if(selecionada.podeMover(destino)){
+					g.setColor(Color.GREEN);  // movimento válido
+				 } else {
+					g.setColor(Color.RED); // movimento inválido
+				 }
 
-				// desenhar o rectângulo que indica para onde se está a
-				// tentar mover a peça. A cor indica a validade da jogada
 				Point topo = oTabuleiro.getEcran(destino);
 				g.drawRect(topo.x + 2, topo.y + 2, oTabuleiro.dimensaoCasa() - 4, oTabuleiro.dimensaoCasa() - 4);
 			}
@@ -161,6 +164,7 @@ public class Xadrez extends JFrame implements ActionListener {
 		if (peca != null && peca.getCor() == turno) {
 			selecionada = peca;
 			origem = posicao;
+			posicaoCursor = ecran;
 			repaint();
 		}
 
@@ -188,32 +192,36 @@ public class Xadrez extends JFrame implements ActionListener {
 	 * @param e informações do rato
 	 */
 	private void pousarPeca(MouseEvent e) {
-		Point ecran = e.getPoint();
-		Point destino = oTabuleiro.getCasa(ecran);
+    Point ecran = e.getPoint();
+    Point destino = oTabuleiro.getCasa(ecran);
 
-		if (selecionada == null)
-			return;
+    if (selecionada == null)
+        return;
+    
+    // Verificar se o movimento é válido
+    if (selecionada.podeMover(destino)) {
+        // Mover a peça manualmente
+        oTabuleiro.removerPeca(origem);
+        oTabuleiro.colocarPeca(destino, selecionada);
+        selecionada.mover(destino);
+        
+        // Verificar se precisa promover
+        if (selecionada instanceof Peao) {
+            if ((selecionada.getCor() == Peca.BRANCAS && destino.y == 8) || 
+                (selecionada.getCor() == Peca.PRETAS && destino.y == 1)) {
+                Peca nova = promover(selecionada.getCor());
+                oTabuleiro.colocarPeca(destino, nova);
+            }
+        }
+        
+        // Trocar turno
+        turno = (turno == Peca.BRANCAS) ? Peca.PRETAS : Peca.BRANCAS;
+    }
 
-		if (selecionada.podeMover(destino)){
-			oTabuleiro.moverPeca(origem, destino);
-
-			if(selecionada instanceof Peao){
-				if((selecionada.getCor() == Peca.BRANCAS && destino.y == 8) || 
-				(selecionada.getCor() == Peca.PRETAS && destino.y == 1)) {
-					Peca nova = promover(selecionada.getCor());
-					oTabuleiro.colocarPeca(destino, nova);
-					
-				
-				}
-			}
-			turno = (turno == Peca.BRANCAS) ? Peca.PRETAS : Peca.BRANCAS;
-		}
-
-		// a jogada foi feita, desselecionar a peça e redesenhar o jogo
-		selecionada = null;
-		repaint();
-	}
-
+    // Desselecionar a peça e redesenhar
+    selecionada = null;
+    repaint();
+}
 	/**
 	 * pede qual a peça a usar para substituir o peão
 	 * 
@@ -231,13 +239,14 @@ public class Xadrez extends JFrame implements ActionListener {
 					JOptionPane.QUESTION_MESSAGE, null, opcoes, opcoes[0]);
 		} while (res == JOptionPane.CLOSED_OPTION);
 		switch (res) {
-			// TODO criar a peça substituta
-			case 0: // rainha
-			case 1: // torre
-			case 2: // bispo
-			case 3: // cavalo
+			case 0: return new Rainha(cor, cor == Peca.BRANCAS ? rainhaBranca : rainhaPreta);
+			case 1: return new Torre(cor, cor == Peca.BRANCAS ? torreBranca : torrePreta);
+			case 2: return new Bispo(cor, cor == Peca.BRANCAS ? bispoBranco : bispoPreto);
+			case 3: return new Cavalo(cor, cor == Peca.BRANCAS ? cavaloBranco : cavaloPreto);
+			default:
+				return new Rainha(cor, cor == Peca.BRANCAS ? rainhaBranca : rainhaPreta);
 		}
-		return null;
+		
 	}
 
 	/**
