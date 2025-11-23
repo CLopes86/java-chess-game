@@ -467,13 +467,13 @@ private static int DIMCASA = 72;          // Tamanho das peças
 <div align="center">
   <img src="https://github.com/CLopes86.png" width="150" style="border-radius: 50%;" />
   
-  ### ***Cesaltino Lopes (Cesaltino)**
+  ### ***Cesaltino Lopes **
   
   🎓 Estudante de Infoormatica e Multimedia<br>
   📍 Instituto Politécnico de Castelo Branco (IPCB)<br>
   📅 3º Ano - 2025/2026
   
-  [![LinkedIn](https://img.shields.io/badge/LinkedIn-Joaquim_Lopes-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/joaquim-lopes-a75032168/)
+  [![LinkedIn](https://img.shields.io/badge/LinkedIn-Joaquim_Lopes-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://https://www.linkedin.com/in/cesaltino-lopes-55274b176/)
   [![GitHub](https://img.shields.io/badge/GitHub-CLopes86-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/CLopes86)
   [![Email](https://img.shields.io/badge/Email-Contacto-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:c.lopes46cv@gmail.com)
 </div>
