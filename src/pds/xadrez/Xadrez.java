@@ -198,9 +198,66 @@ public class Xadrez extends JFrame implements ActionListener {
     if (selecionada == null)
         return;
     
-    // Verificar se o movimento é válido
+    // Verificar se o movimento é válido (regras da peça)
     if (selecionada.podeMover(destino)) {
-        // Mover a peça manualmente
+        
+        // SIMULAR o movimento para verificar se deixa o Rei em xeque
+        Peca pecaCapturada = oTabuleiro.simularMovimento(origem, destino);
+        
+        // Verificar se o nosso próprio Rei fica em xeque
+        boolean deixaReiEmXeque = oTabuleiro.reiEmXeque(turno);
+        
+        // Se o movimento deixa o Rei em xeque, DESFAZER e NÃO permitir!
+        if (deixaReiEmXeque) {
+            oTabuleiro.desfazerMovimento(origem, destino, pecaCapturada);
+            selecionada = null;
+            repaint();
+            return;
+        }
+        
+        // Movimento é seguro para o jogador atual!
+        // Agora verificar se coloca adversário em xeque ou xeque-mate
+        int corAdversario = (turno == Peca.BRANCAS) ? Peca.PRETAS : Peca.BRANCAS;
+        
+        if (oTabuleiro.reiEmXeque(corAdversario)) {
+    // Adversário está em xeque! Verificar se é mate
+    if (oTabuleiro.estaEmXequeMate(corAdversario)) {
+        // XEQUE-MATE! Jogo termina!
+        oTabuleiro.desfazerMovimento(origem, destino, pecaCapturada);
+        
+        oTabuleiro.removerPeca(origem);
+        oTabuleiro.colocarPeca(destino, selecionada);
+        selecionada.mover(destino);
+        
+        String vencedor = (turno == Peca.BRANCAS) ? "BRANCAS" : "PRETAS";
+        JOptionPane.showMessageDialog(this, 
+            "XEQUE-MATE!\n\n" + vencedor + " venceram o jogo!", 
+            "Fim de Jogo", 
+            JOptionPane.INFORMATION_MESSAGE);
+        
+        int resposta = JOptionPane.showConfirmDialog(this,
+            "Deseja jogar novamente?",
+            "Novo Jogo",
+            JOptionPane.YES_NO_OPTION);
+        
+        if (resposta == JOptionPane.YES_OPTION) {
+            iniciarJogo();
+        } else {
+            System.exit(0);
+        }
+        
+        selecionada = null;
+        repaint();
+        return;
+    } else {
+        System.out.println("XEQUE!");
+    }
+}
+        
+        // DESFAZER a simulação
+        oTabuleiro.desfazerMovimento(origem, destino, pecaCapturada);
+        
+        // Movimento é válido e não é mate - EXECUTAR de verdade
         oTabuleiro.removerPeca(origem);
         oTabuleiro.colocarPeca(destino, selecionada);
         selecionada.mover(destino);

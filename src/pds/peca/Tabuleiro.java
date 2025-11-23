@@ -247,4 +247,232 @@ public class Tabuleiro {
     public int borda() {
         return borda;
     }
+
+    /**
+ * Verifica se uma determinada casa está sob ataque por peças de uma cor específica
+ * 
+ * @param casa a casa a verificar
+ * @param corAtacante a cor das peças atacantes (Peca.BRANCAS ou Peca.PRETAS)
+ * @return true se a casa está sob ataque, false caso contrário
+ */
+public boolean estaSobAtaque(Point casa, int corAtacante){
+     // Verificar se a casa é válida
+    if (!eCasaValida(casa)){
+        return false;
+    }
+
+    // Percorrer todas as casas do tabuleiro
+    for (int x = 0; x < 8; x++){
+        for(int y = 0; y < 8; y++){
+            // Verificar se há uma peça nesta posição
+            Peca peca = asPecas[x][y];
+
+             // Se há peça E é da cor atacante
+             if(peca != null && peca.getCor() == corAtacante){
+                 // Calcular a posição no formato Point (1-8, não 0-7)
+                 Point posicaoPeca = new Point(x + 1, y +1);
+
+                // Verificar se esta peça pode mover para a casa alvo 
+                if(peca.podeMover(casa)) {
+                    return true; // Casa está sob ataque!
+                }
+
+             }
+
+        }
+    }
+    return false;    // Nenhuma peça pode atacar esta casa
+}
+
+/**
+ * Encontra a posição do Rei de uma determinada cor
+ * 
+ * @param cor a cor do Rei a procurar (Peca.BRANCAS ou Peca.PRETAS)
+ * @return a posição do Rei, ou null se não encontrar
+ */
+public Point encontrarRei(int cor) {
+    // Percorrer todas as casas do tabuleiro
+    for (int x = 0; x < 8; x++) {
+        for (int y = 0; y < 8; y++) {
+            Peca peca = asPecas[x][y];
+            
+            // Verificar se é um Rei da cor certa
+            if (peca != null && peca.getCor() == cor) {
+                String nomePeca = peca.getClass().getSimpleName();
+                
+                // Verificar se é um Rei
+                if (nomePeca.equals("Rei")) {
+                    return new Point(x + 1, y + 1);
+                }
+            }
+        }
+    }
+    
+    return null;
+}
+
+/**
+ * Verifica se o Rei de uma determinada cor está em xeque
+ * 
+ * @param cor a cor do Rei a verificar
+ * @return true se o Rei está em xeque, false caso contrário
+ */
+public boolean reiEmXeque(int cor) {
+     // Encontrar a posição do Rei
+     Point posicaoRei = encontrarRei(cor);
+
+     // Se não encontrar o Rei, retornar false
+     if(posicaoRei == null) {
+        return false;
+     }
+
+       // Determinar a cor do adversário
+       int corAdversario = (cor == Peca.BRANCAS) ? Peca.PRETAS : Peca.BRANCAS;
+
+        // Verificar se a posição do Rei está sob ataque do adversário
+        return estaSobAtaque(posicaoRei, corAdversario);
+}
+
+/**
+ * Simula um movimento temporariamente para verificar se é seguro
+ * 
+ * @param origem casa de origem
+ * @param destino casa de destino
+ * @return a peça que estava no destino (null se vazio, ou peça capturada)
+ */
+/**
+ * Simula um movimento temporariamente para verificar se é seguro
+ * 
+ * @param origem casa de origem
+ * @param destino casa de destino
+ * @return a peça que estava no destino (null se vazio, ou peça capturada)
+ */
+public Peca simularMovimento(Point origem, Point destino) {
+    if (!eCasaValida(origem) || !eCasaValida(destino)) {
+        return null;
+    }
+
+    // Pegar a peça que está na origem
+    Peca pecaMovida = asPecas[origem.x - 1][origem.y - 1];
+
+    // Guardar a peça que está no destino (pode ser null ou uma peça capturada)
+    Peca pecaCapturada = asPecas[destino.x - 1][destino.y - 1];
+
+    // Fazer o movimento temporário no array
+    asPecas[destino.x - 1][destino.y - 1] = pecaMovida;
+    asPecas[origem.x - 1][origem.y - 1] = null;
+
+    // Atualizar posição interna da peça movida
+    if (pecaMovida != null) {
+        pecaMovida.setPosicao(destino);
+    }
+    
+    // IMPORTANTE: Atualizar tabuleiro da peça capturada
+    if (pecaCapturada != null) {
+        pecaCapturada.setTabuleiro(null);
+    }
+
+    // Retornar a peça capturada (para poder desfazer depois)
+    return pecaCapturada;
+}
+/**
+ * Desfaz um movimento simulado
+ * 
+ * @param origem casa de origem original
+ * @param destino casa de destino
+ * @param pecaCapturada a peça que estava no destino (null se estava vazio)
+ */
+public void desfazerMovimento(Point origem, Point destino, Peca pecaCapturada) {
+    if (!eCasaValida(origem) || !eCasaValida(destino)) {
+        return;
+    }
+    
+    // Pegar a peça que está no destino
+    Peca pecaMovida = asPecas[destino.x - 1][destino.y - 1];
+    
+    // Devolver a peça à origem no array
+    asPecas[origem.x - 1][origem.y - 1] = pecaMovida;
+    
+    // Restaurar o que estava no destino
+    asPecas[destino.x - 1][destino.y - 1] = pecaCapturada;
+    
+    // IMPORTANTE: Restaurar posição interna da peça movida
+    if (pecaMovida != null) {
+        pecaMovida.setPosicao(origem);
+    }
+    
+    // IMPORTANTE: Restaurar tabuleiro da peça capturada
+    if (pecaCapturada != null) {
+        pecaCapturada.setTabuleiro(this);
+        pecaCapturada.setPosicao(destino);
+    }
+}
+/**
+ * Verifica se o Rei de uma cor está em xeque-mate
+ * 
+ * @param cor a cor do jogador a verificar
+ * @return true se está em xeque-mate, false caso contrário
+ */
+/**
+ * Verifica se o Rei de uma cor está em xeque-mate
+ * 
+ * @param cor a cor do jogador a verificar
+ * @return true se está em xeque-mate, false caso contrário
+ */
+public boolean estaEmXequeMate(int cor) {
+    // Primeiro, verificar se o Rei está em xeque
+    if (!reiEmXeque(cor)) {
+        return false; // Se não está em xeque, não pode estar em xeque-mate
+    }
+    
+    // O Rei está em xeque! Verificar se há alguma jogada legal
+    
+    // Percorrer todas as peças da cor em xeque
+    for (int x = 0; x < 8; x++) {
+        for (int y = 0; y < 8; y++) {
+            Peca peca = asPecas[x][y];
+            
+            // Se há peça E é da cor em xeque
+            if (peca != null && peca.getCor() == cor) {
+                Point origem = new Point(x + 1, y + 1);
+                
+                // OTIMIZAÇÃO: Testar apenas casas próximas (raio de 7)
+                // Em vez de testar todas as 64 casas
+                for (int dx = -7; dx <= 7; dx++) {
+                    for (int dy = -7; dy <= 7; dy++) {
+                        int destinoX = x + dx;
+                        int destinoY = y + dy;
+                        
+                        // Verificar se está dentro do tabuleiro
+                        if (destinoX >= 0 && destinoX < 8 && destinoY >= 0 && destinoY < 8) {
+                            Point destino = new Point(destinoX + 1, destinoY + 1);
+                            
+                            // Verificar se a peça pode mover para este destino
+                            if (peca.podeMover(destino)) {
+                                // Simular o movimento
+                                Peca pecaCapturada = simularMovimento(origem, destino);
+                                
+                                // Verificar se o Rei ainda está em xeque
+                                boolean aindaEmXeque = reiEmXeque(cor);
+                                
+                                // Desfazer o movimento
+                                desfazerMovimento(origem, destino, pecaCapturada);
+                                
+                                // Se o Rei NÃO está mais em xeque, há uma saída!
+                                if (!aindaEmXeque) {
+                                    return false; // NÃO é xeque-mate!
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Percorremos TODAS as peças e TODOS os movimentos possíveis
+    // Nenhum movimento tira o Rei do xeque
+    // É XEQUE-MATE!
+    return true;
+}
 }
